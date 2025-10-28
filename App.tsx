@@ -4,6 +4,8 @@ import { fetchWeather } from './services/weatherService';
 import SearchBar from './components/SearchBar';
 import WeatherDisplay from './components/WeatherDisplay';
 import Loader from './components/Loader';
+import WeatherBackground from './components/WeatherBackground';
+import { SunSnow } from 'lucide-react';
 
 const App: React.FC = () => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
@@ -44,42 +46,41 @@ const App: React.FC = () => {
     }
   }, []);
   
-  const backgroundClass = useMemo(() => {
-    if (!weatherData) return 'from-gray-700 via-gray-900 to-black';
-    return weatherData.current.is_day 
-      ? 'from-blue-300 via-blue-500 to-purple-600' 
-      : 'from-gray-800 via-slate-900 to-black';
-  }, [weatherData]);
-
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${backgroundClass} text-white transition-all duration-1000 p-4 sm:p-6 lg:p-8 flex flex-col items-center`}>
-      <div className="w-full max-w-4xl mx-auto">
-        <header className="text-center my-6">
-          <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">اپلیکیشن پیش‌بینی آب و هوا</h1>
-          <p className="text-lg font-light text-white/80 mt-2 drop-shadow-md">وضعیت آب و هوای مختصات مورد نظر خود را جستجو کنید</p>
-        </header>
-        
-        <main>
-          <SearchBar onSearch={handleSearch} initialLat="35.72" initialLon="51.39" loading={loading} />
+    <div className={`relative min-h-screen text-white transition-colors duration-1000 overflow-hidden`}>
+      <WeatherBackground weatherCode={weatherData?.current.weather_code} isDay={weatherData?.current.is_day === 1} />
+      <div className="relative z-10 p-4 sm:p-6 lg:p-8 flex flex-col items-center min-h-screen bg-black/10">
+        <div className="w-full max-w-6xl mx-auto">
+          <header className="flex items-center justify-center gap-3 my-6">
+            <SunSnow className="w-10 h-10 text-yellow-300 drop-shadow-lg" />
+            <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg text-center">
+              اپلیکیشن آب و هوا
+            </h1>
+          </header>
           
-          <div className="mt-8">
-            {loading && <Loader />}
-            {error && (
-              <div className="bg-red-500/50 text-white p-4 rounded-lg text-center backdrop-blur-sm border border-red-500/60">
-                <p className="font-semibold">خطا!</p>
-                <p>{error}</p>
-              </div>
-            )}
-            {weatherData && !loading && !error && (
-              <WeatherDisplay data={weatherData} />
-            )}
-            {!weatherData && !loading && !error && (
-                 <div className="text-center p-8 bg-black/20 rounded-xl backdrop-blur-md border border-white/10">
-                    <p className="text-xl text-white/70">برای شروع، مختصات جغرافیایی را وارد و جستجو کنید.</p>
+          <main>
+            <SearchBar onSearch={handleSearch} initialLat="35.72" initialLon="51.39" loading={loading} />
+            
+            <div className="mt-8">
+              {loading && <Loader />}
+              {error && (
+                <div className="bg-red-500/50 text-white p-4 rounded-lg text-center backdrop-blur-sm border border-red-500/60 animate-fade-in">
+                  <p className="font-semibold">خطا!</p>
+                  <p>{error}</p>
                 </div>
-            )}
-          </div>
-        </main>
+              )}
+              {weatherData && !loading && !error && (
+                <WeatherDisplay data={weatherData} />
+              )}
+              {!weatherData && !loading && !error && (
+                   <div className="text-center p-8 mt-16 animate-fade-in">
+                      <h2 className="text-2xl font-semibold text-white/90 drop-shadow-md">به پیش‌بینی آب و هوا خوش آمدید</h2>
+                      <p className="text-lg text-white/70 mt-2 drop-shadow-md">برای شروع، مختصات جغرافیایی مورد نظر خود را وارد و جستجو کنید.</p>
+                  </div>
+              )}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );
